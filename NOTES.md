@@ -5,7 +5,8 @@
 - In practice, an objective function is not known explicitly but only incompletely by a small set of input-output vectors, $T=\{(i, o)| i\in I'\subseteq I^{n}, o\in O'\subseteq O^{m}, f(i)=o\}$, called the ***training set***.
 - A ***genetic program*** can then be regarded as a prediction model which approximates a given objective function, based on a training set.
 - Training samples, or elements of $T$, are known as ***fitness cases***. 
-- A ***programming language*** $\mathcal{L}$ is defined by the user over an ***instruction set*** and a so-called ***terminal set*** which comprise input values, constants, and memory variables.
+- The ***instruction set*** defines the particular programming language that is evolved.
+- A ***programming language*** $\mathcal{L}$ is defined by the user over an instruction set and a so-called ***terminal set*** which comprise input values, constants, and memory variables.
 - The ***genotype space*** $\mathcal{G}$ includes all programs of a certain ***representation (type)*** that can be composed of elements from a programming language $\mathcal{L}$. 
 - The ***phenotype space*** $\mathcal{P}$ denotes the set of all mathematical functions $f_{gp}:I^{n}\rightarrow O^{m}$ with $f_{gp}\in\mathcal{P}$ and $gp\in\mathcal{G}$. 
 - The ***fitness function*** $\mathcal{F}:\mathcal{P}\rightarrow V$ measures the prediction quality, the ***fitness***, of a phenotype $f_{gp}\in\mathcal{P}$.
@@ -18,3 +19,26 @@
 - Code which manipulates registers not having an impact on the program output at the current position is called ***noneffective code*** or ***introns***. 
 - An ***absolute program*** includes all instructions including introns, whereas an ***effective program*** contains only the structurally effective instructions.
 - The ***(effective) length*** of a program is measured in the number of (effective) instructions it holds.
+- An ***imperative instruction*** includes an operation on ***operand*** (or ***source***) ***registers*** and an assignment of the result of that operation to a ***destination registers***.
+- The ***register set*** denotes the set of user-defined variable registers.
+- The ***input registers*** hold the program inputs before execution.
+- The ***calculation registers*** are initialized with a constant value each time a program is executed on a fitness case.
+- One or more input/calculation registers are defined as ***output register(s)***. The standard output register is $r_0$.
+
+#### Other Notes, Comments, and Requirements
+- This project will study 3-register instructions with a free choice of operands.
+- In this implementation, all registers hold floating-point values. 
+- Internally, constants are stored in registers that are write protected, i.e., may not become destination registers. As a consequence, the set of of possible constants remains fixed. 
+- Constants are addressed by indices in the internal program representation just like variable registers and operators. 
+- Constant registers are only initialized once at the beginning of a run with values from a user-defined range.
+- The maximum number of variable registers and constant registers is restricted to 256.
+- Every instruction will be held as a single 32-bit integer value, where the first 8 bits identify the operator, and the next 8 bits possibly identifies a source register, and so on.
+- A program is then represented as an array of 32-bit integers.
+- From now on, a register only refers to a variable register and a constant register is identified with its constant value.
+- Two-operand instructions may either possess two indexed variables (registers) $r_i$ as operands or one indexed variable and a constant.
+- One-operand instructions only use register operands.
+- If there cannot be more than one constant per instruction, the percentage of instructions holding a constant is equal to the proportion of constants $p_{const}$ in programs. This is also the selection probability of a constant operand during initialization of programs and during mutations. This project will use $p_{const}=0.5$ by default.
+- To assure semantic correctness, partially defined operators and functions may be protected by returning a high value for undefined input, e.g., $c_{undef}=10^6$.
+- The return of high values will act as a penalty for programs that use these otherwise undefined operations. 
+- This project will only use the 4 arithmetic operations: $+, -, \times, /$
+- The only protection needed is on the division operator where the instruction is $r_i = r_j / r_k$ and if $r_k\neq 0$, then $r_i = r_j/r_k$ otherwise $r_i = r_j + c_{undef}$.

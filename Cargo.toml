@@ -4,3 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+rand = "0.8"
+
+[lib]
+name = "lgp_core"
+path = "src/lib.rs"
+
+[[bin]]
+name = "linear_genetic_program"
+path = "src/main.rs"

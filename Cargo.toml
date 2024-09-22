@@ -6,5 +6,8 @@ members = [
     "ea_core"
 ]
 
-lgp_core = { path = "../lgp_core" }
 resolver = "2"
+
+[workspace.dependencies]
+lgp_core = { path = "lgp_core" }
+ea_core = { path = "ea_core" }

@@ -1,15 +1,10 @@
-[package]
-name = "linear_genetic_program"
-version = "0.1.0"
-edition = "2021"
+[workspace]
 
-[dependencies]
-rand = "0.8"
+members = [
+    "lgp",
+    "lgp_core",
+    "ea_core"
+]
 
-[lib]
-name = "lgp_core"
-path = "src/lib.rs"
-
-[[bin]]
-name = "linear_genetic_program"
-path = "src/main.rs"
+lgp_core = { path = "../lgp_core" }
+resolver = "2"

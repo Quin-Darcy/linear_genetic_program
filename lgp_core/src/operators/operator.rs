@@ -1,5 +1,3 @@
-use crate::program::registers::Registers;
-
 
 // Each of the operators in the programming language will implement the Operator trait
 pub trait Operator {

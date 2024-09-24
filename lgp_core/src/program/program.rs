@@ -1,4 +1,5 @@
 use rand::Rng;
+use crate::operators::operator_set::OperatorSet;
 use crate::program::registers::Registers;
 use crate::constants::{
     NUM_OPS,
@@ -8,12 +9,15 @@ use crate::constants::{
     OPCODE_ADD,
     OPCODE_SUB,
     OPCODE_MUL,
-    OPCODE_DIV
+    OPCODE_DIV,
+    NUM_INPUTS,
+    NUM_OUTPUTS,
 };
 
 pub struct Program {
     pub instructions: Vec<Instruction>,
-    pub registers: Registers
+    pub registers: Registers,
+    pub num_instructions: usize
 }
 
 impl Program {
@@ -36,6 +40,7 @@ impl Program {
         Program {
             instructions,
             registers: Registers::new()
+            num_instructions
         }
     }
 
@@ -80,5 +85,38 @@ impl Program {
             | ((instruction_bytes[1] as u32) << 16)
             | ((instruction_bytes[2] as u32) << 8)
             | (instruction_bytes[3] as u32)
+    }
+
+    fn decode(instruction: u32) -> [u8; 4] {
+        let bytes: [u8; 4] = [
+            (instruction >> 24) as u8,
+            (instruction >> 16 & 0xFF) as u8,
+            (instruction >> 8 & 0xFF) as u8,
+            (instruction & 0xFF) as u8,
+        ];
+        bytes
+    }    
+
+    pub fn run(&mut self, input: [f32; NUM_INPUTS]) -> [f32; NUM_OUTPUTS] {
+        if NUM_VAR_REG < NUM_INPUTS {
+            // TODO: Add better error handling
+            panic!("Err: Too many inputs.");
+        }
+
+        // Initialize the variable registers with the input
+        for i in 0..NUM_INPUTS {
+            self.registers.variable_registers[i] = input[i];
+        }
+
+        // Create OperatorSet instance to dynamically call operators
+        let op_set = OperatorSet::new();
+
+        // Step through each instruction in the program
+        for i in 0..self.num_instructions {
+            let instruction_bytes: [u8; 4] = self.decode(self.instructions[i]);
+            let operator: &dyn Operator = op_set.get_operator(instruction_bytes[0]);
+            let operands: Vec<f32> = vec![this.registers.variable_registers]
+            operator.apply()
+        }
     }
 }

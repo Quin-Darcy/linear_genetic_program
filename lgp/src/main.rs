@@ -1,4 +1,5 @@
 use lgp_core::program::Program;
+use lgp_core::constants::{NUM_INPUTS, NUM_OUTPUTS};
 
 fn main() {
     let min_length: usize = 8;
@@ -6,5 +7,10 @@ fn main() {
     let mut prog: Program = Program::new_random(min_length, max_length);
 
     println!("Program: {:?}", prog.instructions);
-    println!("Constants: {:?}", prog.registers.constants);
+
+    let inputs: [f32; NUM_INPUTS] = [1.0];
+    
+    let outputs: [f32; NUM_OUTPUTS] = prog.run(&inputs);
+
+    println!("OUTPUTS: {:?}", outputs);
 }

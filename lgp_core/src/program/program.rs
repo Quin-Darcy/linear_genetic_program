@@ -1,5 +1,6 @@
 use rand::Rng;
 use crate::operators::operator_set::OperatorSet;
+use crate::operators::operator::Operator;
 use crate::program::registers::Registers;
 use crate::constants::{
     NUM_OPS,
@@ -17,7 +18,6 @@ use crate::constants::{
 pub struct Program {
     pub instructions: Vec<Instruction>,
     pub registers: Registers,
-    pub num_instructions: usize
 }
 
 impl Program {
@@ -40,7 +40,6 @@ impl Program {
         Program {
             instructions,
             registers: Registers::new()
-            num_instructions
         }
     }
 
@@ -97,8 +96,39 @@ impl Program {
         bytes
     }    
 
-    pub fn run(&mut self, input: [f32; NUM_INPUTS]) -> [f32; NUM_OUTPUTS] {
-        if NUM_VAR_REG < NUM_INPUTS {
+    fn run_instruction(&mut self, instruction: u32, op_set: &OperatorSet) {
+        let mut is_constant: bool = true;
+        // Get the first bit which indicates constant or variable
+        if instruction & 0x80000000 == 0 {
+            // This means the bit is not set and the 3rd byte
+            // is to be interpretted as the index of a variable register
+            is_constant = false;
+        }
+
+        // Get the bytes of the instruction
+        let instruction_bytes: [u8; 4] = Program::decode(instruction);
+        // Zeroize the first bit to restore the actual opcode index
+        let opcode: u8 = instruction_bytes[0] & 0x7F;
+        let operator: &dyn Operator = op_set.get_operator(opcode);
+
+        // Collect the operands in a vector
+        let index_one: usize = instruction_bytes[1] as usize;
+        let index_two: usize = instruction_bytes[2] as usize;
+        let index_three: usize = instruction_bytes[3] as usize;
+
+        // Collect the operands in single vector
+        let operands: Vec<f32> = if is_constant {
+            vec![self.registers.variable_registers[index_two], self.registers.constants[index_three]]
+        } else {
+            vec![self.registers.variable_registers[index_two], self.registers.variable_registers[index_three]]
+        };
+
+        // Apply the instruction by passing operands and mutable ref to 
+        operator.apply(&operands, &mut self.registers.variable_registers[index_one]);
+    }
+
+    pub fn run(&mut self, input: &[f32; NUM_INPUTS]) -> [f32; NUM_OUTPUTS] {
+        if NUM_VAR_REG < NUM_INPUTS as u8 {
             // TODO: Add better error handling
             panic!("Err: Too many inputs.");
         }
@@ -112,11 +142,16 @@ impl Program {
         let op_set = OperatorSet::new();
 
         // Step through each instruction in the program
-        for i in 0..self.num_instructions {
-            let instruction_bytes: [u8; 4] = self.decode(self.instructions[i]);
-            let operator: &dyn Operator = op_set.get_operator(instruction_bytes[0]);
-            let operands: Vec<f32> = vec![this.registers.variable_registers]
-            operator.apply()
+        let num_instructions: usize = self.instructions.len();
+        for i in 0..num_instructions {
+            self.run_instruction(self.instructions[i], &op_set);
         }
+
+        // Collect the outputs
+        let mut outputs = [0.0; NUM_OUTPUTS];
+        for i in 0..NUM_OUTPUTS {
+            outputs[i] = self.registers.variable_registers[i];
+        }
+        outputs
     }
 }

@@ -1,16 +1,11 @@
 use lgp_core::program::Program;
 use lgp_core::constants::{NUM_INPUTS, NUM_OUTPUTS};
+use ea_core::population::Population;
 
 fn main() {
     let min_length: usize = 8;
     let max_length: usize = 16;
-    let mut prog: Program = Program::new_random(min_length, max_length);
+    let population_size: usize = 10;
 
-    println!("Program: {:?}", prog.instructions);
-
-    let inputs: [f32; NUM_INPUTS] = [1.0];
-    
-    let outputs: [f32; NUM_OUTPUTS] = prog.run(&inputs);
-
-    println!("OUTPUTS: {:?}", outputs);
+    let mut pop = Population::new(population_size, min_length, max_length);
 }

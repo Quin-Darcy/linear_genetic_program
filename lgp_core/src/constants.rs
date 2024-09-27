@@ -8,6 +8,8 @@ pub const OPCODE_MUL: u8 = 2;
 pub const OPCODE_DIV: u8 = 3;
 
 pub const DIV_UNDEF: f32 = f32::MAX;
+
+// Somehow it has to be enforced that these both be smaller than the number of variable registers
 pub const NUM_INPUTS: usize = 1;
 pub const NUM_OUTPUTS: usize = 1;
 

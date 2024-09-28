@@ -29,14 +29,14 @@ impl Population {
         }
     }
 
-    fn evaluate(&mut self) {
+
+    pub fn evaluate(&mut self) -> Vec<f32> {
+        // Run the training data through each genotype
         for i in 0..self.population_size {
             self.genotypes[i].compute_total_fitness(&self.training_set);
         }
-    }
 
-    pub fn get_fitnesses(&mut self) -> Vec<f32> {
-        self.evaluate();
+        // Collect the resulting fitnesses and return them
         let mut fitnesses: Vec<f32> = Vec::with_capacity(self.population_size);
         for i in 0..self.population_size {
             fitnesses.push(self.genotypes[i].fitness.unwrap());

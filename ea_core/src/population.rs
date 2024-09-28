@@ -29,15 +29,25 @@ impl Population {
         }
     }
 
-    pub fn evaluate(&mut self) -> Vec<[f32; NUM_OUTPUTS]> {
-        let mut results: Vec<[f32; NUM_OUTPUTS]> = Vec::with_capacity(self.population_size);
-
+    fn evaluate(&mut self) {
         for i in 0..self.population_size {
             for j in 0..self.training_set.len() {
-                results.push(self.genotypes[i].express(&self.training_set[j].0));
+                // This runs the input through each program and allows each to set the output
+                self.genotypes[i].express(&mut self.training_set[j].0);
+                // Pass in the expected result to be compared against each program's output
+                self.genotypes[i].set_fitness(&self.training_set[j].1);
             }
         }
-
-        results
     }
+
+    pub fn get_fitnesses(&mut self) -> Vec<f32> {
+        self.evaluate();
+        let mut fitnesses: Vec<f32> = Vec::with_capacity(self.population_size);
+        for i in 0..self.population_size {
+            fitnesses.push(self.genotypes[i].fitness.unwrap());
+        }
+        fitnesses
+    }
+
+    // TODO: The fitness value should be the averaged fitness across all training cases
 }

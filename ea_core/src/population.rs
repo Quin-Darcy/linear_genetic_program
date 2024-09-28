@@ -31,12 +31,7 @@ impl Population {
 
     fn evaluate(&mut self) {
         for i in 0..self.population_size {
-            for j in 0..self.training_set.len() {
-                // This runs the input through each program and allows each to set the output
-                self.genotypes[i].express(&mut self.training_set[j].0);
-                // Pass in the expected result to be compared against each program's output
-                self.genotypes[i].set_fitness(&self.training_set[j].1);
-            }
+            self.genotypes[i].compute_total_fitness(&self.training_set);
         }
     }
 

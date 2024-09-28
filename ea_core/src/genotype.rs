@@ -19,15 +19,31 @@ impl Genotype {
         }
     }
 
-    pub fn express(&mut self, input: &[f32; NUM_INPUTS]) {
+    fn express(&mut self, input: &[f32; NUM_INPUTS]) {
         self.output = Some(self.program.run(input));
     }
 
-    pub fn set_fitness(&mut self, expected: &[f32; NUM_OUTPUTS]) {
-        self.fitness = Some(expected.iter()
+    fn compute_fitness(&mut self, input: &[f32; NUM_INPUTS], expected: &[f32; NUM_OUTPUTS]) -> f32 {
+        // Run the program with the given input allowing the genotype to capture its output
+        self.express(input);
+
+        // Use the stored output to compare against the expected value(s) to compute fitness
+        let fitness: f32 = expected.iter()
             .zip(self.output.unwrap().iter())
             .map(|(a, b)| (a - b).powf(2.0))
-            .sum::<f32>() / (expected.len() as f32));
+            .sum::<f32>() / (expected.len() as f32);
+        
+        fitness
+    }
+
+    pub fn compute_total_fitness(&mut self, training_set: &Vec<([f32; NUM_INPUTS], [f32; NUM_OUTPUTS])>) {
+        // Computes the total fitness over the entire training set
+        let mut total_fitness: f32 = 0.0;
+
+        for i in 0..training_set.len() {
+            total_fitness += self.compute_fitness(&training_set[i].0, &training_set[i].1);
+        }
+        self.fitness = Some( 1.0 / (total_fitness / (training_set.len() as f32)));
     }
 
     // TODO: Add mutation method    pub

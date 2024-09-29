@@ -9,7 +9,13 @@ fn main() {
 
     let mut pop = Population::new(population_size, min_length, max_length, training_set);
 
-    let fitnesses: Vec<f32> = pop.evaluate(); 
+    let mut fitnesses: Vec<f32> = pop.evaluate(); 
+
+    println!("{:?}", fitnesses);
+
+    pop.tournament_selection(4);
+
+    fitnesses = pop.evaluate();
 
     println!("{:?}", fitnesses);
 }

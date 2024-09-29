@@ -1,7 +1,7 @@
 use lgp_core::program::Program;
 use lgp_core::constants::{NUM_INPUTS, NUM_OUTPUTS};
 
-
+#[derive(Clone)]
 pub struct Genotype {
     pub program: Program,
     pub fitness: Option<f32>,
@@ -43,8 +43,26 @@ impl Genotype {
         for i in 0..training_set.len() {
             total_fitness += self.compute_fitness(&training_set[i].0, &training_set[i].1);
         }
-        self.fitness = Some( 1.0 / (total_fitness / (training_set.len() as f32)));
+
+        let mut candidate_val: f32 = 1.0 / (total_fitness / (training_set.len() as f32));
+        if candidate_val.is_nan() || candidate_val.is_infinite() {
+            candidate_val = 0.0;
+        }
+        self.fitness = Some(candidate_val);
     }
 
-    // TODO: Add mutation method    pub
+    pub fn recombine_with(&self, _other: &Genotype) -> Genotype {
+        // For testing purposes, simply return a clone of the first parent (self)
+        Genotype {
+            program: self.program.clone(), // Assuming Program implements Clone
+            fitness: None,                 // Reset fitness
+            output: None,                  // Reset output
+        }
+    }
+
+    // Blank mutation: does nothing for now
+    pub fn mutate(&mut self, _mutation_rate: f32) {
+        // For testing purposes, this does nothing
+        // In the future, this will modify the program with some probability
+    }
 }

@@ -1,5 +1,6 @@
 use crate::constants::{NUM_VAR_REG, NUM_CON_REG};
 
+#[derive(Clone)]
 pub struct Registers {
     pub variable_registers: [f32; NUM_VAR_REG as usize],
     pub constants: [f32; NUM_CON_REG as usize]

@@ -15,6 +15,7 @@ use crate::constants::{
     NUM_OUTPUTS,
 };
 
+#[derive(Clone)]
 pub struct Program {
     pub instructions: Vec<Instruction>,
     pub registers: Registers,

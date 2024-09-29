@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 lgp_core = { path = "../lgp_core" }
+rand = "0.8"
